@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeStudy — Learn Without Limits</title>
+<style>
+:root {
+  --bg:#f4f6fb;--bg2:#eaecf5;--card:#ffffff;--card2:#f7f8fc;
+  --text:#12153d;--text2:#6b7280;--text3:#9ca3af;
+  --primary:#4f46e5;--primary-h:#4338ca;--primary-lt:#ede9fe;
+  --accent:#f97316;--accent-lt:#fff7ed;
+  --success:#059669;--success-lt:#d1fae5;
+  --danger:#dc2626;--danger-lt:#fee2e2;
+  --warning:#d97706;--warning-lt:#fef3c7;
+  --info:#0891b2;--info-lt:#cffafe;
+  --border:#e5e7eb;--border2:#d1d5db;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08);
+  --shadow:0 4px 16px rgba(79,70,229,.07),0 2px 6px rgba(0,0,0,.06);
+  --shadow-lg:0 12px 40px rgba(79,70,229,.13),0 4px 12px rgba(0,0,0,.08);
+  --shadow-xl:0 24px 64px rgba(0,0,0,.18);
+  --radius-xs:6px;--radius-sm:10px;--radius:14px;--radius-lg:20px;--radius-xl:28px;
+  --nav-h:62px;--sidebar-w:248px;
+  --trans:0.22s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"]{
+  --bg:#0b0c1a;--bg2:#111226;--card:#151629;--card2:#1c1d33;
+  --text:#e8e9ff;--text2:#9ca3af;--text3:#6b7280;
+  --primary:#6366f1;--primary-h:#818cf8;--primary-lt:#1e1b4b;
+  --accent:#fb923c;--accent-lt:#431407;
+  --success:#10b981;--success-lt:#064e3b;
+  --danger:#ef4444;--danger-lt:#450a0a;
+  --warning:#f59e0b;--warning-lt:#451a03;
+  --info:#22d3ee;--info-lt:#083344;
+  --border:#252642;--border2:#333558;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.4);
+  --shadow:0 4px 16px rgba(0,0,0,.35);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.5);
+  --shadow-xl:0 24px 64px rgba(0,0,0,.7);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background var(--trans),color var(--trans);overflow-x:hidden;}
+a{color:inherit;text-decoration:none;}
+button{cursor:pointer;font-family:inherit;border:none;background:none;}
+input,select,textarea{font-family:inherit;outline:none;}
+img{max-width:100%;display:block;}
+ul{list-style:none;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:var(--primary);border-radius:99px;}
+
+/* UTILITY */
+.hidden{display:none!important;}
+.flex{display:flex;}.flex-col{flex-direction:column;}
+.items-center{align-items:center;}.justify-between{justify-content:space-between;}.justify-center{justify-content:center;}
+.gap-6{gap:6px;}.gap-8{gap:8px;}.gap-12{gap:12px;}.gap-16{gap:16px;}
+.flex-1{flex:1;}.min-w-0{min-width:0;}.wrap{flex-wrap:wrap;}
+.text-center{text-align:center;}.text-muted{color:var(--text2);}
+.text-sm{font-size:.82rem;}.text-xs{font-size:.74rem;}
+.font-bold{font-weight:700;}.font-600{font-weight:600;}
+.mt-4{margin-top:4px;}.mt-8{margin-top:8px;}.mt-16{margin-top:16px;}.mt-24{margin-top:24px;}
+.mb-8{margin-bottom:8px;}.mb-16{margin-bottom:16px;}
+.w-full{width:100%;}.truncate{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+
+/* LOADING OVERLAY */
+#loading-overlay{
+  position:fixed;inset:0;background:linear-gradient(135deg,#4f46e5,#7c3aed);
+  z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity .4s ease;
+}
+#loading-overlay.fade-out{opacity:0;pointer-events:none;}
+.loader-logo{font-size:3rem;animation:bounce 1s ease-in-out infinite;}
+.loader-text{color:rgba(255,255,255,.9);font-size:1rem;font-weight:600;letter-spacing:.5px;}
+.loader-sub{color:rgba(255,255,255,.6);font-size:.8rem;}
+.loader-bar{width:200px;height:3px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;}
+.loader-fill{height:100%;background:#fff;border-radius:99px;width:0;transition:width .4s ease;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* API LOADING SPINNER */
+#api-spinner{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8999;
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+#api-spinner.show{display:flex;}
+.spinner-box{
+  background:var(--card);border-radius:var(--radius-lg);
+  padding:28px 36px;text-align:center;box-shadow:var(--shadow-xl);
+  display:flex;flex-direction:column;align-items:center;gap:14px;min-width:200px;
+}
+.spinner{
+  width:40px;height:40px;border:3px solid var(--border2);
+  border-top-color:var(--primary);border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-msg{font-size:.87rem;font-weight:600;color:var(--text2);}
+
+/* UPLOAD PROGRESS */
+.upload-prog-wrap{
+  margin-top:10px;display:none;
+}
+.upload-prog-wrap.show{display:block;}
+.upload-prog-bar{height:6px;background:var(--border2);border-radius:99px;overflow:hidden;}
+.upload-prog-fill{
+  height:100%;width:0;
+  background:linear-gradient(90deg,var(--primary),#7c3aed);
+  border-radius:99px;transition:width .3s ease;
+}
+.upload-prog-label{font-size:.76rem;color:var(--text2);margin-top:5px;text-align:center;}
+
+/* DROP ZONE */
+.drop-zone{
+  border:2px dashed var(--border2);border-radius:var(--radius-sm);
+  padding:24px;text-align:center;cursor:pointer;
+  transition:all var(--trans);background:var(--card2);
+}
+.drop-zone:hover,.drop-zone.drag-over{
+  border-color:var(--primary);background:var(--primary-lt);
+}
+.drop-zone-icon{font-size:2rem;margin-bottom:8px;}
+.drop-zone-text{font-size:.84rem;color:var(--text2);}
+.drop-zone-text strong{color:var(--primary);}
+.file-selected{
+  display:none;align-items:center;gap:10px;
+  padding:12px;background:var(--success-lt);border-radius:var(--radius-sm);
+  border:1px solid var(--success);margin-top:8px;
+}
+.file-selected.show{display:flex;}
+.file-name{font-size:.84rem;font-weight:600;color:var(--success);flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+
+/* TOAST */
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:8888;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{
+  background:var(--card);border-radius:var(--radius-sm);padding:13px 18px;
+  box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;
+  font-size:.86rem;font-weight:500;pointer-events:auto;min-width:230px;max-width:360px;
+  border-left:3px solid var(--primary);animation:toastIn .3s cubic-bezier(.34,1.56,.64,1) both;color:var(--text);
+}
+.toast.removing{animation:toastOut .25s ease forwards;}
+.toast.success{border-color:var(--success);}
+.toast.error{border-color:var(--danger);}
+.toast.warning{border-color:var(--warning);}
+.toast-icon{font-size:1.1rem;flex-shrink:0;}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(40px)}}
+
+/* CONFIRM */
+#confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
+#confirm-overlay.open{display:flex;}
+.confirm-box{background:var(--card);border-radius:var(--radius-lg);padding:32px 28px;max-width:380px;width:100%;text-align:center;box-shadow:var(--shadow-xl);animation:modalIn .25s cubic-bezier(.34,1.56,.64,1);}
+.confirm-emoji{font-size:3rem;margin-bottom:10px;display:block;}
+.confirm-box h3{font-size:1.15rem;font-weight:700;margin-bottom:8px;}
+.confirm-box p{color:var(--text2);font-size:.88rem;margin-bottom:24px;line-height:1.6;}
+.confirm-btns{display:flex;gap:10px;justify-content:center;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:6000;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border-radius:var(--radius-lg);width:100%;max-width:500px;box-shadow:var(--shadow-xl);animation:modalIn .25s cubic-bezier(.34,1.56,.64,1);max-height:90vh;overflow-y:auto;}
+.modal.lg{max-width:860px;}
+.modal-header{padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;}
+.modal-header h3{font-size:1.05rem;font-weight:700;}
+.modal-close{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:1.2rem;transition:background var(--trans);}
+.modal-close:hover{background:var(--danger-lt);color:var(--danger);}
+.modal-body{padding:22px 24px;}
+.modal-footer{padding:16px 24px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+@keyframes modalIn{from{opacity:0;transform:scale(.92) translateY(12px)}to{opacity:1;transform:none}}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:var(--radius-sm);font-size:.875rem;font-weight:600;cursor:pointer;transition:all var(--trans);white-space:nowrap;border:2px solid transparent;line-height:1;}
+.btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important;}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+.btn-primary:hover:not(:disabled){background:var(--primary-h);border-color:var(--primary-h);transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,70,229,.35);}
+.btn-accent{background:var(--accent);color:#fff;}
+.btn-success{background:var(--success);color:#fff;}
+.btn-success:hover:not(:disabled){filter:brightness(1.1);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover:not(:disabled){filter:brightness(1.1);}
+.btn-ghost{background:transparent;color:var(--text2);border-color:var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--card2);color:var(--text);}
+.btn-outline{background:transparent;color:var(--primary);border-color:var(--primary);}
+.btn-outline:hover:not(:disabled){background:var(--primary-lt);}
+.btn-sm{padding:7px 12px;font-size:.78rem;border-radius:var(--radius-xs);}
+.btn-xs{padding:4px 9px;font-size:.72rem;border-radius:var(--radius-xs);}
+.btn-full{width:100%;}
+
+/* FORMS */
+.form-group{margin-bottom:18px;}
+.form-label{display:block;font-size:.75rem;font-weight:700;color:var(--text2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.6px;}
+.form-control{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:var(--radius-sm);background:var(--card2);color:var(--text);font-size:.9rem;transition:border var(--trans),box-shadow var(--trans);}
+.form-control:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(79,70,229,.12);background:var(--card);}
+.form-control::placeholder{color:var(--text3);}
+select.form-control option{background:var(--card);color:var(--text);}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.badge-student{background:var(--info-lt);color:var(--info);}
+.badge-teacher{background:var(--success-lt);color:var(--success);}
+.badge-admin{background:var(--primary-lt);color:var(--primary);}
+.badge-success{background:var(--success-lt);color:var(--success);}
+.badge-danger{background:var(--danger-lt);color:var(--danger);}
+.badge-neutral{background:var(--card2);color:var(--text2);}
+
+/* AUTH */
+#auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#1d4ed8 100%);}
+.auth-bg-orb{position:absolute;border-radius:50%;pointer-events:none;animation:orbFloat 8s ease-in-out infinite;}
+.auth-bg-orb.o1{width:400px;height:400px;background:radial-gradient(circle,rgba(99,102,241,.3),transparent 70%);top:-100px;right:-80px;}
+.auth-bg-orb.o2{width:300px;height:300px;background:radial-gradient(circle,rgba(249,115,22,.2),transparent 70%);bottom:-60px;left:-60px;animation-delay:-4s;}
+@keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+.auth-card{background:rgba(255,255,255,.97);border-radius:var(--radius-xl);padding:40px 36px;width:100%;max-width:460px;box-shadow:0 30px 80px rgba(0,0,0,.35);position:relative;z-index:1;animation:slideUp .45s cubic-bezier(.34,1.56,.64,1);}
+[data-theme="dark"] .auth-card{background:rgba(21,22,41,.97);border:1px solid var(--border);}
+.auth-logo-wrap{text-align:center;margin-bottom:28px;}
+.auth-logo-icon{width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 14px;box-shadow:0 8px 24px rgba(79,70,229,.4);}
+.auth-logo-wrap h1{font-size:1.9rem;font-weight:900;background:linear-gradient(135deg,#4f46e5,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.auth-logo-wrap p{color:var(--text2);font-size:.87rem;margin-top:3px;}
+.auth-tab-row{display:flex;gap:4px;background:var(--bg2);border-radius:var(--radius-sm);padding:4px;margin-bottom:24px;}
+.auth-tab{flex:1;padding:10px;border-radius:7px;font-size:.875rem;font-weight:700;color:var(--text2);transition:all var(--trans);}
+.auth-tab.active{background:var(--primary);color:#fff;box-shadow:0 3px 10px rgba(79,70,229,.35);}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+
+/* APP LAYOUT */
+#app{display:none;flex-direction:column;min-height:100vh;}
+#app.active{display:flex;}
+.topbar{height:var(--nav-h);background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;position:sticky;top:0;z-index:500;box-shadow:var(--shadow-sm);}
+.topbar-logo{font-size:1.25rem;font-weight:900;background:linear-gradient(135deg,#4f46e5,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;}
+.topbar-spacer{flex:1;}
+.theme-toggle{width:38px;height:38px;border-radius:50%;background:var(--card2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.05rem;transition:all var(--trans);cursor:pointer;}
+.theme-toggle:hover{border-color:var(--primary);background:var(--primary-lt);}
+.user-pill{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border-radius:99px;background:var(--card2);border:1.5px solid var(--border);}
+.user-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--primary),#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.85rem;}
+.user-pill-name{font-weight:600;font-size:.83rem;max-width:90px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.user-pill-role{font-size:.7rem;color:var(--text2);}
+.hamburger-btn{width:38px;height:38px;border-radius:var(--radius-xs);display:none;align-items:center;justify-content:center;font-size:1.3rem;color:var(--text);transition:background var(--trans);}
+.hamburger-btn:hover{background:var(--card2);}
+.main-wrapper{display:flex;flex:1;overflow:hidden;}
+.sidebar-veil{display:none;position:fixed;inset:0;top:var(--nav-h);background:rgba(0,0,0,.5);z-index:399;}
+.sidebar-veil.open{display:block;}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--card);border-right:1px solid var(--border);padding:16px 10px;overflow-y:auto;transition:transform var(--trans);}
+.sidebar-section-label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:10px 12px 5px;margin-top:4px;}
+.nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;border-radius:var(--radius-sm);font-size:.875rem;font-weight:600;color:var(--text2);transition:all var(--trans);cursor:pointer;text-align:left;position:relative;}
+.nav-btn:hover{background:var(--primary-lt);color:var(--primary);}
+.nav-btn.active{background:var(--primary);color:#fff;}
+.nav-btn .nav-icon{font-size:1.1rem;flex-shrink:0;}
+.content-pane{flex:1;overflow-y:auto;padding:26px;background:var(--bg);}
+
+/* PANELS */
+.panel{display:none;}
+.panel.active{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.page-hdr-title h2{font-size:1.45rem;font-weight:800;letter-spacing:-.3px;}
+.page-hdr-title p{color:var(--text2);font-size:.84rem;margin-top:3px;}
+.page-hdr-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:26px;}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:18px;display:flex;align-items:center;gap:14px;border:1px solid var(--border);box-shadow:var(--shadow);transition:transform var(--trans);}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+.stat-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0;}
+.ic-indigo{background:var(--primary-lt);color:var(--primary);}
+.ic-orange{background:var(--accent-lt);color:var(--accent);}
+.ic-green{background:var(--success-lt);color:var(--success);}
+.ic-blue{background:var(--info-lt);color:var(--info);}
+.stat-val{font-size:1.75rem;font-weight:800;line-height:1;}
+.stat-lbl{font-size:.75rem;color:var(--text2);margin-top:3px;font-weight:500;}
+
+/* BATCH CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;}
+.batch-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;transition:transform var(--trans),box-shadow var(--trans);display:flex;flex-direction:column;}
+.batch-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+.batch-thumb{width:100%;height:148px;background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);display:flex;align-items:center;justify-content:center;font-size:3.5rem;flex-shrink:0;overflow:hidden;position:relative;}
+.batch-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.batch-thumb-placeholder{position:relative;z-index:1;}
+.batch-body{padding:16px;flex:1;display:flex;flex-direction:column;}
+.batch-name{font-weight:700;font-size:.98rem;margin-bottom:5px;}
+.batch-meta{font-size:.78rem;color:var(--text2);margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;}
+.batch-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;background:var(--card);}
+thead tr{background:linear-gradient(90deg,var(--primary),#7c3aed);}
+th{padding:12px 16px;text-align:left;color:#fff;font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;}
+td{padding:11px 16px;border-bottom:1px solid var(--border);font-size:.85rem;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--primary-lt);}
+
+/* SEARCH */
+.search-wrap{display:flex;align-items:center;gap:9px;background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;transition:border var(--trans);min-width:240px;}
+.search-wrap:focus-within{border-color:var(--primary);box-shadow:0 0 0 4px rgba(79,70,229,.1);}
+.search-wrap input{border:none;background:transparent;color:var(--text);font-size:.875rem;flex:1;outline:none;}
+.search-wrap input::placeholder{color:var(--text3);}
+.search-icon{color:var(--text3);font-size:1rem;flex-shrink:0;}
+
+/* ACCORDION */
+.accordion-list{display:flex;flex-direction:column;gap:10px;}
+.accordion-item{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;}
+.accordion-head{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;transition:background var(--trans);user-select:none;}
+.accordion-head:hover{background:var(--primary-lt);}
+.subj-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:1.2rem;overflow:hidden;color:#fff;}
+.subj-icon img{width:100%;height:100%;object-fit:cover;}
+.accordion-title{font-weight:700;font-size:.92rem;flex:1;min-width:0;}
+.accordion-arrow{color:var(--text3);font-size:.85rem;transition:transform var(--trans);flex-shrink:0;}
+.accordion-item.open .accordion-arrow{transform:rotate(90deg);color:var(--primary);}
+.accordion-body{display:none;padding:16px;border-top:1px solid var(--border);background:var(--card2);}
+.accordion-item.open .accordion-body{display:block;animation:fadeIn .2s ease;}
+
+/* CONTENT CARDS */
+.content-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.content-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;transition:transform var(--trans),box-shadow var(--trans);}
+.content-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);}
+.content-thumb{width:100%;height:116px;position:relative;background:linear-gradient(135deg,#1e1b4b,#312e81);display:flex;align-items:center;justify-content:center;font-size:2.8rem;overflow:hidden;}
+.content-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.content-thumb-icon{position:relative;z-index:1;}
+.content-type-tag{position:absolute;top:7px;right:7px;z-index:2;background:rgba(0,0,0,.75);color:#fff;padding:2px 8px;border-radius:99px;font-size:.68rem;font-weight:700;backdrop-filter:blur(4px);text-transform:uppercase;}
+.content-body{padding:12px;}
+.content-title{font-weight:600;font-size:.85rem;line-height:1.4;margin-bottom:8px;}
+.content-row{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;}
+.viewed-tag{display:inline-flex;align-items:center;gap:3px;font-size:.7rem;color:var(--success);font-weight:700;}
+
+/* BREADCRUMB */
+.breadcrumb{display:flex;align-items:center;gap:5px;font-size:.81rem;color:var(--text2);margin-bottom:18px;flex-wrap:wrap;}
+.bc-sep{opacity:.4;}
+.bc-item{cursor:pointer;transition:color var(--trans);}
+.bc-item:hover{color:var(--primary);}
+.bc-item.current{color:var(--text);font-weight:600;cursor:default;}
+
+/* PROGRESS */
+.prog-track{height:6px;background:var(--border2);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--primary),#7c3aed);border-radius:99px;transition:width .6s ease;}
+
+/* VIEWER */
+.viewer-frame{width:100%;aspect-ratio:16/9;border:none;border-radius:var(--radius-sm);background:#000;}
+.pdf-frame{width:100%;height:68vh;border:none;border-radius:var(--radius-sm);}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 24px;display:flex;flex-direction:column;align-items:center;}
+.empty-icon{font-size:4rem;margin-bottom:14px;}
+.empty-state h3{font-size:1.1rem;font-weight:700;margin-bottom:6px;}
+.empty-state p{color:var(--text2);font-size:.85rem;margin-bottom:20px;max-width:300px;line-height:1.6;}
+
+/* MISC */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.divider{height:1px;background:var(--border);margin:20px 0;}
+.section-title{font-size:1rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.ch-item{display:flex;align-items:center;gap:12px;padding:13px 18px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);transition:transform var(--trans);}
+.ch-item:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg);}
+.ch-icon{font-size:1.3rem;flex-shrink:0;}
+.ch-name{font-weight:600;font-size:.9rem;flex:1;min-width:0;}
+.ch-actions{display:flex;gap:6px;flex-shrink:0;}
+
+/* PDF UPLOAD TOGGLE */
+.pdf-source-tabs{display:flex;gap:4px;background:var(--bg2);border-radius:var(--radius-sm);padding:4px;margin-bottom:16px;}
+.pdf-tab{flex:1;padding:8px;border-radius:7px;font-size:.8rem;font-weight:700;color:var(--text2);transition:all var(--trans);cursor:pointer;text-align:center;}
+.pdf-tab.active{background:var(--primary);color:#fff;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hamburger-btn{display:flex;}
+  .sidebar{position:fixed;top:var(--nav-h);left:0;bottom:0;z-index:400;transform:translateX(-100%);box-shadow:var(--shadow-xl);}
+  .sidebar.open{transform:translateX(0);}
+  .content-pane{padding:16px;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .cards-grid{grid-template-columns:1fr;}
+  .user-pill-name,.user-pill-role{display:none;}
+  .page-hdr{flex-direction:column;}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr;}
+  .auth-card{padding:28px 20px;}
+  .content-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loading-overlay">
+  <div class="loader-logo" id="loader-logo-el">🎓</div>
+  <div class="loader-text">FreeStudy</div>
+  <div class="loader-sub" id="loader-sub">Initializing…</div>
+  <div class="loader-bar"><div class="loader-fill" id="loader-fill"></div></div>
+</div>
+
+<!-- API SPINNER -->
+<div id="api-spinner">
+  <div class="spinner-box">
+    <div class="spinner"></div>
+    <div class="spinner-msg" id="spinner-msg">Please wait…</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<!-- CONFIRM -->
+<div id="confirm-overlay">
+  <div class="confirm-box">
+    <span class="confirm-emoji" id="cfm-emoji">⚠️</span>
+    <h3 id="cfm-title">Are you sure?</h3>
+    <p id="cfm-msg">This action cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" id="cfm-yes-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-batch">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-batch-title">Create Batch</h3>
+      <button class="modal-close" onclick="closeModal('modal-batch')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Batch Name *</label>
+        <input class="form-control" id="bi-name" placeholder="e.g. JEE 2025 Batch A">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Thumbnail — YouTube/Drive URL ya Image URL</label>
+        <input class="form-control" id="bi-thumb" placeholder="https://youtube.com/watch?v=..." oninput="onBatchThumbInput()">
+        <div id="bi-thumb-preview" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-batch')">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-batch" onclick="saveBatch()">💾 Save Batch</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-subject">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-subj-title">Add Subject</h3>
+      <button class="modal-close" onclick="closeModal('modal-subject')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Subject Name *</label>
+        <input class="form-control" id="si-name" placeholder="e.g. Mathematics">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Logo — Image URL (optional)</label>
+        <input class="form-control" id="si-logo" placeholder="https://...png" oninput="showImgPreview('si-logo','si-logo-preview')">
+        <div id="si-logo-preview" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-subject')">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-subj" onclick="saveSubject()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-chapter">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-chap-title">Add Chapter</h3>
+      <button class="modal-close" onclick="closeModal('modal-chapter')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Chapter Name *</label>
+        <input class="form-control" id="chi-name" placeholder="e.g. Chapter 1 — Introduction">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Chapter Logo URL (optional)</label>
+        <input class="form-control" id="chi-logo" placeholder="https://...png" oninput="showImgPreview('chi-logo','chi-logo-preview')">
+        <div id="chi-logo-preview" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-chapter')">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-chap" onclick="saveChapter()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT MODAL — with PDF upload -->
+<div class="modal-overlay" id="modal-content">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-cont-title">Add Content</h3>
+      <button class="modal-close" onclick="closeModal('modal-content')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Type *</label>
+        <select class="form-control" id="ci-type" onchange="onContentTypeChange()">
+          <option value="video">🎥 Video</option>
+          <option value="notes">📄 PDF / Notes</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Title *</label>
+        <input class="form-control" id="ci-title" placeholder="e.g. Intro to Quadratic Equations">
+      </div>
+
+      <!-- VIDEO section -->
+      <div id="video-section">
+        <div class="form-group">
+          <label class="form-label">Video URL *</label>
+          <input class="form-control" id="ci-url" placeholder="YouTube URL or direct URL" oninput="onVideoUrlInput()">
+          <div id="ci-url-preview" style="margin-top:8px"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="ci-thumb-label">Thumbnail <span style="color:var(--text2);font-size:.8rem">(YouTube se auto-fill hota hai)</span></label>
+          <input class="form-control" id="ci-thumb" placeholder="Auto ya https://...jpg" oninput="showImgPreview('ci-thumb','ci-thumb-preview')">
+          <div id="ci-thumb-preview" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <!-- PDF section -->
+      <div id="pdf-section" style="display:none;">
+        <div class="pdf-source-tabs">
+          <div class="pdf-tab active" id="pdf-tab-upload" onclick="switchPdfTab('upload')">📤 Device se Upload</div>
+          <div class="pdf-tab" id="pdf-tab-url" onclick="switchPdfTab('url')">🔗 URL se Link</div>
+        </div>
+
+        <!-- Upload tab -->
+        <div id="pdf-upload-tab">
+          <div class="drop-zone" id="drop-zone" onclick="document.getElementById('pdf-file-input').click()" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+            <div class="drop-zone-icon">📁</div>
+            <div class="drop-zone-text"><strong>Click karo</strong> ya PDF yahan drag karo</div>
+            <div style="font-size:.74rem;color:var(--text3);margin-top:4px;">Max 25MB • PDF only</div>
+          </div>
+          <input type="file" id="pdf-file-input" accept=".pdf,application/pdf" style="display:none" onchange="onFileSelect(event)">
+          <div class="file-selected" id="file-selected-box">
+            <span style="font-size:1.4rem;">📄</span>
+            <div class="file-name" id="file-name-label">file.pdf</div>
+            <button class="btn btn-ghost btn-xs" onclick="clearFile()">✕</button>
+          </div>
+          <div class="upload-prog-wrap" id="upload-prog-wrap">
+            <div class="upload-prog-bar"><div class="upload-prog-fill" id="upload-prog-fill"></div></div>
+            <div class="upload-prog-label" id="upload-prog-label">Uploading…</div>
+          </div>
+          <div id="ci-existing-file" style="margin-top:8px;font-size:.8rem;color:var(--text2);"></div>
+        </div>
+
+        <!-- URL tab -->
+        <div id="pdf-url-tab" style="display:none;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">PDF URL *</label>
+            <input class="form-control" id="ci-pdf-url" placeholder="https://drive.google.com/... ya direct PDF link">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-content')">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-cont" onclick="saveContent()">💾 Save Content</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEWER -->
+<div class="modal-overlay" id="modal-viewer">
+  <div class="modal lg">
+    <div class="modal-header">
+      <h3 id="viewer-title">Viewing</h3>
+      <button class="modal-close" onclick="closeViewer()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:14px;">
+      <div id="viewer-body"></div>
+    </div>
+    <div class="modal-footer">
+      <a class="btn btn-success" id="viewer-dl" href="#" target="_blank">⬇️ Download / Open</a>
+      <button class="btn btn-ghost" onclick="closeViewer()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-bg-orb o1"></div>
+  <div class="auth-bg-orb o2"></div>
+  <div class="auth-card">
+    <div class="auth-logo-wrap">
+      <div class="auth-logo-icon" id="auth-logo-el">🎓</div>
+      <h1>FreeStudy</h1>
+      <p>Learn Without Limits</p>
+    </div>
+    <div class="auth-tab-row">
+      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+    <div id="form-login">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-control" type="email" id="l-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-control" type="password" id="l-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:4px;" id="btn-login" onclick="doLogin()">🔓 Login</button>
+    </div>
+    <div id="form-signup" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-control" id="s-name" placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-control" type="email" id="s-email" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-control" type="password" id="s-pw" placeholder="Minimum 6 characters">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role</label>
+        <select class="form-control" id="s-role">
+          <option value="student">🎓 Student</option>
+          <option value="teacher">👨‍🏫 Teacher</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:4px;" id="btn-signup" onclick="doSignup()">🚀 Create Account</button>
+      <p class="text-sm text-muted text-center mt-16">Already have an account? <span style="color:var(--primary);cursor:pointer;font-weight:600;" onclick="switchTab('login')">Login</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header class="topbar">
+    <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+    <div class="topbar-logo">🎓 FreeStudy</div>
+    <div class="topbar-spacer"></div>
+    <button class="theme-toggle" onclick="toggleTheme()"><span id="theme-icon">🌙</span></button>
+    <div class="user-pill">
+      <div class="user-avatar" id="topbar-avatar">U</div>
+      <div>
+        <div class="user-pill-name" id="topbar-name">User</div>
+        <div class="user-pill-role" id="topbar-role">student</div>
+      </div>
+    </div>
+    <button class="btn btn-danger btn-sm" onclick="doLogout()">Logout</button>
+  </header>
+  <div class="main-wrapper">
+    <div class="sidebar-veil" id="sidebar-veil" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+      <nav id="sidebar-nav"></nav>
+    </aside>
+    <main class="content-pane" id="content-pane">
+
+      <!-- ADMIN PANELS -->
+      <div class="panel" id="panel-admin-dash">
+        <div class="page-hdr"><div class="page-hdr-title"><h2>📊 Admin Dashboard</h2><p>Platform overview</p></div></div>
+        <div class="stats-grid" id="adm-stats"></div>
+        <div class="section-title">👥 Recent Registrations</div>
+        <div id="adm-recent"></div>
+      </div>
+      <div class="panel" id="panel-admin-users">
+        <div class="page-hdr"><div class="page-hdr-title"><h2>👥 All Users</h2><p>Manage students and teachers</p></div></div>
+        <div class="toolbar">
+          <div class="search-wrap" style="flex:1;max-width:400px;">
+            <span class="search-icon">🔍</span>
+            <input id="search-users" placeholder="Search by name, email or role…" oninput="renderUsersTable()">
+          </div>
+        </div>
+        <div id="users-tbl"></div>
+      </div>
+      <div class="panel" id="panel-admin-batches">
+        <div class="page-hdr"><div class="page-hdr-title"><h2>📦 All Batches</h2><p>Platform-wide batch management</p></div></div>
+        <div class="toolbar">
+          <div class="search-wrap" style="flex:1;max-width:400px;">
+            <span class="search-icon">🔍</span>
+            <input id="search-abatches" placeholder="Search batches…" oninput="renderAdminBatches()">
+          </div>
+        </div>
+        <div id="admin-batches-tbl"></div>
+      </div>
+
+      <!-- TEACHER PANELS -->
+      <div class="panel" id="panel-teacher-dash">
+        <div class="page-hdr"><div class="page-hdr-title"><h2>📊 Teacher Dashboard</h2><p>Your teaching summary</p></div></div>
+        <div class="stats-grid" id="tch-stats"></div>
+        <div class="section-title" style="margin-top:8px;">📦 My Batches (Quick View)</div>
+        <div class="cards-grid" id="tch-quick-batches"></div>
+      </div>
+      <div class="panel" id="panel-teacher-batches">
+        <div class="page-hdr">
+          <div class="page-hdr-title"><h2 id="tch-panel-title">📦 My Batches</h2><p id="tch-panel-sub">Manage your content</p></div>
+          <div class="page-hdr-actions" id="tch-panel-actions"></div>
+        </div>
+        <div id="tch-breadcrumb"></div>
+        <div id="tch-panel-body"></div>
+      </div>
+      <div class="panel" id="panel-teacher-analytics">
+        <div class="page-hdr"><div class="page-hdr-title"><h2>📈 Analytics</h2><p>Student engagement & progress</p></div></div>
+        <div id="analytics-body"></div>
+      </div>
+
+      <!-- STUDENT PANELS -->
+      <div class="panel" id="panel-student-dash">
+        <div class="page-hdr"><div class="page-hdr-title"><h2 id="stu-greet">👋 Welcome Back!</h2><p>Continue your learning journey</p></div></div>
+        <div class="stats-grid" id="stu-stats"></div>
+        <div class="section-title" style="margin-top:8px;">📦 Continue Learning</div>
+        <div class="cards-grid" id="stu-continue"></div>
+      </div>
+      <div class="panel" id="panel-student-browse">
+        <div class="page-hdr"><div class="page-hdr-title"><h2>🔍 Browse Batches</h2><p>Find and join courses</p></div></div>
+        <div class="toolbar">
+          <div class="search-wrap" style="flex:1;max-width:400px;">
+            <span class="search-icon">🔍</span>
+            <input id="search-browse" placeholder="Search batches…" oninput="renderBrowse()">
+          </div>
+        </div>
+        <div class="cards-grid" id="browse-grid"></div>
+      </div>
+      <div class="panel" id="panel-student-my">
+        <div class="page-hdr">
+          <div class="page-hdr-title"><h2 id="stu-my-title">📚 My Batches</h2><p id="stu-my-sub">Your enrolled courses</p></div>
+          <div class="page-hdr-actions" id="stu-my-actions"></div>
+        </div>
+        <div id="stu-breadcrumb"></div>
+        <div id="stu-my-body"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   ⚙️ CONFIG — Apps Script deploy URL yahan paste karo
+   ================================================================ */
+const API_URL = 'https://script.google.com/macros/s/AKfycbwcJKT5FcaHRgsJQBE5Jh7P6ZNFHGuRgZZSb2m16zv67RMaidnkv686OLBSYPy1KBnMSA/exec';
+const APP_LOGO_URL = ''; // Optional: apni logo image URL
+
+/* ================================================================
+   ADMIN CREDENTIALS
+   ================================================================ */
+const ADMIN_CREDS = {
+  email: 'sharmatushya7@gmail.com', password: 'A1S2D3F4',
+  role: 'admin', name: 'Admin (Tushya)', id: '__admin__'
+};
+
+/* ================================================================
+   IN-MEMORY DATABASE (fetched from server once on login)
+   ================================================================ */
+let DB = { users:[], batches:[], subjects:[], chapters:[], content:[], enrollments:[], views:[] };
+let CU = null;       // current user
+let editId = null;
+let confirmCb = null;
+let TV = { level:'batches', batchId:null, subjectId:null, chapterId:null };
+let SV = { level:'batches', batchId:null, subjectId:null, chapterId:null };
+let pdfFile = null;          // selected File object for upload
+let pdfTabMode = 'upload';   // 'upload' | 'url'
+
+/* ================================================================
+   API CALL
+   ================================================================ */
+async function api(action, data={}, spinnerMsg='Loading…', silent=false) {
+  if (!silent) showSpinner(spinnerMsg);
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action, ...data })
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Server error');
+    return json.data;
+  } catch(err) {
+    toast(err.message || 'Network error. Check your connection.', 'error');
+    throw err;
+  } finally {
+    if (!silent) hideSpinner();
+  }
+}
+
+function showSpinner(msg='Loading…') {
+  document.getElementById('spinner-msg').textContent = msg;
+  document.getElementById('api-spinner').classList.add('show');
+}
+function hideSpinner() {
+  document.getElementById('api-spinner').classList.remove('show');
+}
+
+/* ================================================================
+   UTILS
+   ================================================================ */
+const esc   = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtD  = ts => { if(!ts) return ''; try{ return new Date(Number(ts)).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }catch(e){ return ts; } };
+const uid   = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const set$  = (id,html) => { const el=document.getElementById(id); if(el) el.innerHTML=html; };
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+function toast(msg, type='info') {
+  const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span class="toast-icon">${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => { el.classList.add('removing'); setTimeout(()=>el.remove(),300); }, 3500);
+}
+
+/* ================================================================
+   CONFIRM
+   ================================================================ */
+function confirm2(title, msg, cb, emoji='⚠️') {
+  document.getElementById('cfm-title').textContent = title;
+  document.getElementById('cfm-msg').textContent = msg;
+  document.getElementById('cfm-emoji').textContent = emoji;
+  confirmCb = cb;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  confirmCb = null;
+}
+document.getElementById('cfm-yes-btn').onclick = () => { if(confirmCb) confirmCb(); closeConfirm(); };
+
+/* ================================================================
+   MODAL
+   ================================================================ */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); });
+});
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+    closeConfirm(); clearViewer();
+  }
+});
+
+/* ================================================================
+   THEME (localStorage okay hai — sirf preference hai)
+   ================================================================ */
+function toggleTheme() {
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  const next = dark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  document.getElementById('theme-icon').textContent = next==='dark' ? '☀️' : '🌙';
+  localStorage.setItem('fs_theme', next);
+}
+function applyTheme() {
+  const t = localStorage.getItem('fs_theme')||'light';
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme-icon').textContent = t==='dark' ? '☀️' : '🌙';
+}
+
+/* ================================================================
+   SIDEBAR
+   ================================================================ */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-veil').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-veil').classList.remove('open');
+}
+
+/* ================================================================
+   THUMBNAIL HELPERS
+   ================================================================ */
+function extractThumbUrl(url) {
+  if (!url) return null;
+  const ytM = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytM) return 'https://img.youtube.com/vi/' + ytM[1] + '/hqdefault.jpg';
+  const drM = url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]{20,})/);
+  if (drM) return 'https://drive.google.com/thumbnail?id=' + drM[1] + '&sz=w400';
+  return null;
+}
+function showImgPreview(inputId, previewId) {
+  const url = (document.getElementById(inputId)||{}).value?.trim();
+  const el  = document.getElementById(previewId);
+  if (!el) return;
+  el.innerHTML = url
+    ? `<img src="${esc(url)}" style="max-height:72px;border-radius:8px;border:1px solid var(--border);object-fit:cover" onerror="this.parentElement.innerHTML='<span style=color:var(--danger);font-size:.8rem>⚠️ Image load nahi hua</span>'">`
+    : '';
+}
+function onVideoUrlInput() {
+  const url = document.getElementById('ci-url')?.value?.trim();
+  const thumb = extractThumbUrl(url);
+  const lbl = document.getElementById('ci-thumb-label');
+  if (thumb) {
+    document.getElementById('ci-thumb').value = thumb;
+    showImgPreview('ci-thumb','ci-thumb-preview');
+    if(lbl) lbl.innerHTML = 'Thumbnail <span style="color:var(--success);font-size:.8rem">✅ Auto-fetched!</span>';
+  } else {
+    if(lbl) lbl.innerHTML = 'Thumbnail <span style="color:var(--text2);font-size:.8rem">(YouTube se auto-fill hota hai)</span>';
+  }
+}
+function onBatchThumbInput() {
+  const inputEl = document.getElementById('bi-thumb');
+  if (!inputEl) return;
+  const url = inputEl.value.trim();
+  const thumb = extractThumbUrl(url);
+  if (thumb && url !== thumb) { inputEl.value = thumb; toast('Thumbnail auto-fetch ho gaya!','success'); }
+  showImgPreview('bi-thumb','bi-thumb-preview');
+}
+
+/* ================================================================
+   AUTH
+   ================================================================ */
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-signup').classList.toggle('active', tab==='signup');
+  document.getElementById('form-login').style.display = tab==='login' ? '' : 'none';
+  document.getElementById('form-signup').style.display = tab==='signup' ? '' : 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pw    = document.getElementById('l-pw').value;
+  if (!email||!pw) return toast('Please fill in all fields.','warning');
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  try {
+    const user = await api('login', { email, password:pw }, 'Logging in…');
+    CU = user;
+    sessionStorage.setItem('fs_cur', JSON.stringify(CU));
+    await loadData();
+    bootApp();
+  } catch(e) {
+    // error already shown by api()
+  } finally { btn.disabled = false; }
+}
+
+async function doSignup() {
+  const name  = document.getElementById('s-name').value.trim();
+  const email = document.getElementById('s-email').value.trim();
+  const pw    = document.getElementById('s-pw').value;
+  const role  = document.getElementById('s-role').value;
+  if (!name||!email||!pw) return toast('Please fill in all fields.','warning');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast('Enter a valid email.','error');
+  const btn = document.getElementById('btn-signup');
+  btn.disabled = true;
+  try {
+    await api('signup', { name, email, password:pw, role }, 'Creating account…');
+    toast('Account created! You can now login.','success');
+    switchTab('login');
+    document.getElementById('l-email').value = email;
+    document.getElementById('l-pw').value = '';
+  } catch(e) {} finally { btn.disabled = false; }
+}
+
+function doLogout() {
+  confirm2('Logout','Are you sure you want to logout?', () => {
+    CU = null; DB = { users:[], batches:[], subjects:[], chapters:[], content:[], enrollments:[], views:[] };
+    sessionStorage.removeItem('fs_cur');
+    document.getElementById('app').classList.remove('active');
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('auth-screen').style.display = '';
+    document.getElementById('l-email').value='';
+    document.getElementById('l-pw').value='';
+  }, '👋');
+}
+
+/* ================================================================
+   DATA LOAD
+   ================================================================ */
+async function loadData() {
+  const data = await api('getData', { userId: CU.id, role: CU.role }, 'Loading your data…');
+  DB = {
+    users:       data.users       || [],
+    batches:     data.batches     || [],
+    subjects:    data.subjects    || [],
+    chapters:    data.chapters    || [],
+    content:     data.content     || [],
+    enrollments: data.enrollments || [],
+    views:       data.views       || []
+  };
+}
+
+/* ================================================================
+   BOOT APP
+   ================================================================ */
+function bootApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('app').classList.add('active');
+  document.getElementById('topbar-avatar').textContent = CU.name[0].toUpperCase();
+  document.getElementById('topbar-name').textContent   = CU.name;
+  document.getElementById('topbar-role').textContent   = CU.role;
+  buildSidebar();
+  const defaultPage = { admin:'admin-dash', teacher:'teacher-dash', student:'student-dash' }[CU.role];
+  goTo(defaultPage);
+}
+
+function buildSidebar() {
+  const navs = {
+    admin:   [{id:'admin-dash',icon:'📊',text:'Dashboard'},{id:'admin-users',icon:'👥',text:'All Users'},{id:'admin-batches',icon:'📦',text:'All Batches'}],
+    teacher: [{id:'teacher-dash',icon:'📊',text:'Dashboard'},{id:'teacher-batches',icon:'📦',text:'My Batches'},{id:'teacher-analytics',icon:'📈',text:'Analytics'}],
+    student: [{id:'student-dash',icon:'📊',text:'Dashboard'},{id:'student-browse',icon:'🔍',text:'Browse Batches'},{id:'student-my',icon:'📚',text:'My Batches'}]
+  };
+  set$('sidebar-nav', navs[CU.role].map(n =>
+    `<button class="nav-btn" id="nav-${n.id}" onclick="goTo('${n.id}')"><span class="nav-icon">${n.icon}</span>${n.text}</button>`
+  ).join(''));
+}
+
+function goTo(id) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const panel = document.getElementById('panel-'+id);
+  const nav   = document.getElementById('nav-'+id);
+  if (panel) panel.classList.add('active');
+  if (nav)   nav.classList.add('active');
+  closeSidebar();
+  const fn = {
+    'admin-dash':        renderAdminDash,
+    'admin-users':       renderUsersTable,
+    'admin-batches':     renderAdminBatches,
+    'teacher-dash':      renderTeacherDash,
+    'teacher-batches':   renderTeacherBatchesPanel,
+    'teacher-analytics': renderAnalytics,
+    'student-dash':      renderStudentDash,
+    'student-browse':    renderBrowse,
+    'student-my':        renderStudentMyPanel,
+  }[id];
+  if (fn) fn();
+}
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+function emptyState(icon, title, msg, btnLabel='', btnFn='') {
+  return `<div class="empty-state"><div class="empty-icon">${icon}</div><h3>${title}</h3><p>${msg}</p>${btnLabel?`<button class="btn btn-primary" onclick="${btnFn}">${btnLabel}</button>`:''}</div>`;
+}
+function breadcrumb(items) {
+  return `<div class="breadcrumb">${items.map((it,i)=>{
+    const sep = i>0 ? '<span class="bc-sep">›</span>' : '';
+    return it.current ? `${sep}<span class="bc-item current">${esc(it.text)}</span>`
+                      : `${sep}<span class="bc-item" onclick="${it.fn}">${esc(it.text)}</span>`;
+  }).join('')}</div>`;
+}
+function statCard(icon, cls, val, lbl) {
+  return `<div class="stat-card"><div class="stat-icon ${cls}">${icon}</div><div><div class="stat-val">${val}</div><div class="stat-lbl">${lbl}</div></div></div>`;
+}
+
+/* ================================================================
+   ADMIN — DASHBOARD
+   ================================================================ */
+function renderAdminDash() {
+  const students = DB.users.filter(u=>u.role==='student');
+  const teachers = DB.users.filter(u=>u.role==='teacher');
+  set$('adm-stats', `
+    ${statCard('👥','ic-indigo', DB.users.length,'Total Users')}
+    ${statCard('🎓','ic-blue', students.length,'Students')}
+    ${statCard('👨‍🏫','ic-green', teachers.length,'Teachers')}
+    ${statCard('📦','ic-orange', DB.batches.length,'Batches')}
+    ${statCard('📝','ic-indigo', DB.enrollments.length,'Enrollments')}
+  `);
+  const recent = [...DB.users].sort((a,b)=>Number(b.createdAt)-Number(a.createdAt)).slice(0,6);
+  set$('adm-recent', buildUserTable(recent));
+}
+
+function renderUsersTable() {
+  const q = (document.getElementById('search-users')?.value||'').toLowerCase();
+  const filtered = DB.users.filter(u=>
+    u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.role?.includes(q)
+  );
+  set$('users-tbl', buildUserTable(filtered, true));
+}
+
+function buildUserTable(users, showDelete=false) {
+  if (!users.length) return emptyState('👥','No Users Found','No users match your search.');
+  return `<div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Role</th><th>Joined</th>${showDelete?'<th>Action</th>':''}</tr></thead>
+    <tbody>${users.map((u,i)=>`<tr>
+      <td><strong>${i+1}</strong></td>
+      <td>${esc(u.name)}</td>
+      <td>${esc(u.email)}</td>
+      <td><span class="badge badge-${u.role}">${u.role}</span></td>
+      <td>${fmtD(u.createdAt)}</td>
+      ${showDelete?`<td><button class="btn btn-danger btn-xs" onclick="adminDeleteUser('${u.id}')">🗑 Delete</button></td>`:''}
+    </tr>`).join('')}
+    </tbody></table></div>`;
+}
+
+async function adminDeleteUser(id) {
+  const u = DB.users.find(u=>u.id===id);
+  confirm2('Delete User', `Delete "${u?.name}"? All their data will be removed.`, async () => {
+    try {
+      await api('deleteUser', { id }, 'Deleting user…');
+      // Update local DB
+      DB.users = DB.users.filter(u=>u.id!==id);
+      DB.enrollments = DB.enrollments.filter(e=>e.studentId!==id);
+      DB.views = DB.views.filter(v=>v.studentId!==id);
+      if (u?.role==='teacher') {
+        const bids = DB.batches.filter(b=>b.teacherId===id).map(b=>b.id);
+        DB.batches = DB.batches.filter(b=>b.teacherId!==id);
+        bids.forEach(bid => localDeleteBatch(bid));
+      }
+      toast('User deleted.','success');
+      renderAdminDash(); renderUsersTable();
+    } catch(e){}
+  },'🗑');
+}
+
+function renderAdminBatches() {
+  const q = (document.getElementById('search-abatches')?.value||'').toLowerCase();
+  const filtered = DB.batches.filter(b=>b.name?.toLowerCase().includes(q));
+  if (!filtered.length) { set$('admin-batches-tbl', emptyState('📦','No Batches','No batches on this platform yet.')); return; }
+  set$('admin-batches-tbl', `<div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Batch Name</th><th>Teacher</th><th>Students</th><th>Created</th><th>Action</th></tr></thead>
+    <tbody>${filtered.map((b,i)=>{
+      const t = DB.users.find(u=>u.id===b.teacherId)||{name:'Unknown'};
+      const sc = DB.enrollments.filter(e=>e.batchId===b.id).length;
+      return `<tr><td>${i+1}</td><td><strong>${esc(b.name)}</strong></td><td>${esc(t.name)}</td>
+        <td><span class="badge badge-success">${sc}</span></td>
+        <td>${fmtD(b.createdAt)}</td>
+        <td><button class="btn btn-danger btn-xs" onclick="adminDeleteBatch('${b.id}')">🗑 Delete</button></td></tr>`;
+    }).join('')}
+    </tbody></table></div>`);
+}
+
+async function adminDeleteBatch(id) {
+  const b = DB.batches.find(b=>b.id===id);
+  confirm2('Delete Batch', `Delete "${b?.name}"?`, async () => {
+    try {
+      await api('deleteBatch', { id }, 'Deleting batch…');
+      localDeleteBatch(id);
+      toast('Batch deleted.','success'); renderAdminBatches();
+    } catch(e){}
+  },'🗑');
+}
+
+function localDeleteBatch(batchId) {
+  DB.batches = DB.batches.filter(b=>b.id!==batchId);
+  const sids = DB.subjects.filter(s=>s.batchId===batchId).map(s=>s.id);
+  DB.subjects = DB.subjects.filter(s=>s.batchId!==batchId);
+  const cids = DB.chapters.filter(c=>sids.includes(c.subjectId)).map(c=>c.id);
+  DB.chapters = DB.chapters.filter(c=>!sids.includes(c.subjectId));
+  DB.content  = DB.content.filter(c=>!cids.includes(c.chapterId));
+  DB.enrollments = DB.enrollments.filter(e=>e.batchId!==batchId);
+}
+
+/* ================================================================
+   TEACHER — DASHBOARD
+   ================================================================ */
+function renderTeacherDash() {
+  const myBatches = DB.batches.filter(b=>b.teacherId===CU.id);
+  const bids = myBatches.map(b=>b.id);
+  const subs  = DB.subjects.filter(s=>bids.includes(s.batchId));
+  const chaps = DB.chapters.filter(c=>subs.map(s=>s.id).includes(c.subjectId));
+  const cont  = DB.content.filter(c=>chaps.map(ch=>ch.id).includes(c.chapterId));
+  const enr   = DB.enrollments.filter(e=>bids.includes(e.batchId));
+  set$('tch-stats', `
+    ${statCard('📦','ic-indigo', myBatches.length,'My Batches')}
+    ${statCard('📚','ic-blue', subs.length,'Subjects')}
+    ${statCard('📖','ic-green', chaps.length,'Chapters')}
+    ${statCard('🎥','ic-orange', cont.length,'Content Items')}
+    ${statCard('👨‍🎓','ic-indigo', [...new Set(enr.map(e=>e.studentId))].length,'Enrolled Students')}
+  `);
+  set$('tch-quick-batches', myBatches.length
+    ? myBatches.slice(0,4).map(b=>batchCardHtml(b,'teacher-quick')).join('')
+    : emptyState('📦','No Batches Yet','Click "My Batches" to create your first batch.','➕ Create Batch',"goTo('teacher-batches')"));
+}
+
+/* ================================================================
+   TEACHER — BATCHES PANEL
+   ================================================================ */
+function renderTeacherBatchesPanel() { renderTchLevel(); }
+function renderTchLevel() {
+  if(TV.level==='batches')  renderTchBatchList();
+  else if(TV.level==='subjects') renderTchSubjects();
+  else if(TV.level==='chapters') renderTchChapters();
+  else renderTchContent();
+}
+
+function renderTchBatchList() {
+  TV = { level:'batches', batchId:null, subjectId:null, chapterId:null };
+  set$('tch-panel-title','📦 My Batches');
+  set$('tch-panel-sub','Create & manage your batches');
+  set$('tch-panel-actions',`<button class="btn btn-primary" onclick="openBatchModal()">➕ New Batch</button>`);
+  set$('tch-breadcrumb','');
+  const batches = DB.batches.filter(b=>b.teacherId===CU.id);
+  if (!batches.length) { set$('tch-panel-body', emptyState('📦','No Batches Yet','Create your first batch!','➕ New Batch','openBatchModal()')); return; }
+  set$('tch-panel-body', `<div class="cards-grid">${batches.map(b=>{
+    const sc = DB.enrollments.filter(e=>e.batchId===b.id).length;
+    const t = b.thumbnail ? `<img src="${esc(b.thumbnail)}" alt="" onerror="this.style.display='none'">` : '';
+    return `<div class="batch-card">
+      <div class="batch-thumb">${t}<span class="batch-thumb-placeholder">${t?'':'📦'}</span></div>
+      <div class="batch-body">
+        <div class="batch-name">${esc(b.name)}</div>
+        <div class="batch-meta"><span>👨‍🎓 ${sc} students</span><span>${fmtD(b.createdAt)}</span></div>
+        <div class="batch-actions">
+          <button class="btn btn-primary btn-sm" onclick="tchOpenBatch('${b.id}')">📚 Open</button>
+          <button class="btn btn-ghost btn-sm" onclick="openBatchModal('${b.id}')">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="tchDeleteBatch('${b.id}')">🗑</button>
+        </div>
+      </div></div>`;
+  }).join('')}</div>`);
+}
+
+function tchOpenBatch(bid)  { TV.level='subjects'; TV.batchId=bid; renderTeacherBatchesPanel(); goTo('teacher-batches'); }
+function tchOpenSubj(sid)   { TV.level='chapters'; TV.subjectId=sid; renderTeacherBatchesPanel(); goTo('teacher-batches'); }
+function tchOpenChap(cid)   { TV.level='content'; TV.chapterId=cid; renderTeacherBatchesPanel(); goTo('teacher-batches'); }
+
+function renderTchSubjects() {
+  const batch = DB.batches.find(b=>b.id===TV.batchId);
+  set$('tch-panel-title',`📚 ${esc(batch?.name||'Batch')}`);
+  set$('tch-panel-sub','Subjects in this batch');
+  set$('tch-panel-actions',`
+    <button class="btn btn-ghost btn-sm" onclick="renderTchBatchList()">← Back</button>
+    <button class="btn btn-primary" onclick="openSubjModal()">➕ Add Subject</button>`);
+  set$('tch-breadcrumb', breadcrumb([{text:'Batches',fn:'renderTchBatchList()'},{text:batch?.name,current:true}]));
+  const subjects = DB.subjects.filter(s=>s.batchId===TV.batchId);
+  if (!subjects.length) { set$('tch-panel-body', emptyState('📚','No Subjects Yet','Add the first subject.','➕ Add Subject','openSubjModal()')); return; }
+  set$('tch-panel-body', `<div class="accordion-list">${subjects.map(s=>{
+    const cc = DB.chapters.filter(c=>c.subjectId===s.id).length;
+    const logoHtml = s.logo ? `<img src="${esc(s.logo)}" alt="" onerror="this.outerHTML='📚'">` : '📚';
+    return `<div class="accordion-item">
+      <div class="accordion-head">
+        <div class="subj-icon">${logoHtml}</div>
+        <div class="accordion-title">${esc(s.name)}</div>
+        <span class="badge badge-neutral" style="margin-right:8px;">${cc} chaps</span>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();tchOpenSubj('${s.id}')">Open →</button>
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openSubjModal('${s.id}')">✏️</button>
+        <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteSubject('${s.id}')">🗑</button>
+        <span class="accordion-arrow">›</span>
+      </div>
+      <div class="accordion-body"><p class="text-sm text-muted">Click <strong>Open →</strong> to manage chapters.</p></div>
+    </div>`;
+  }).join('')}</div>`);
+  document.querySelectorAll('.accordion-head').forEach(h => {
+    h.onclick = () => h.closest('.accordion-item').classList.toggle('open');
+  });
+}
+
+function renderTchChapters() {
+  const batch   = DB.batches.find(b=>b.id===TV.batchId);
+  const subject = DB.subjects.find(s=>s.id===TV.subjectId);
+  set$('tch-panel-title',`📖 ${esc(subject?.name||'Subject')}`);
+  set$('tch-panel-sub','Chapters in this subject');
+  set$('tch-panel-actions',`
+    <button class="btn btn-ghost btn-sm" onclick="tchOpenBatch('${TV.batchId}')">← Back</button>
+    <button class="btn btn-primary" onclick="openChapModal()">➕ Add Chapter</button>`);
+  set$('tch-breadcrumb', breadcrumb([
+    {text:'Batches',fn:'renderTchBatchList()'},
+    {text:batch?.name,fn:`tchOpenBatch('${batch?.id}')`},
+    {text:subject?.name,current:true}
+  ]));
+  const chapters = DB.chapters.filter(c=>c.subjectId===TV.subjectId);
+  if (!chapters.length) { set$('tch-panel-body', emptyState('📖','No Chapters Yet','Add chapters to organise content.','➕ Add Chapter','openChapModal()')); return; }
+  set$('tch-panel-body', `<div class="accordion-list">${chapters.map(ch=>{
+    const cc = DB.content.filter(c=>c.chapterId===ch.id).length;
+    const chIcon = ch.logo ? `<img src="${esc(ch.logo)}" style="width:1.5rem;height:1.5rem;object-fit:cover;border-radius:4px;flex-shrink:0" onerror="this.outerHTML='📖'">` : '📖';
+    return `<div class="ch-item">
+      <span class="ch-icon">${chIcon}</span>
+      <div class="ch-name">${esc(ch.name)}</div>
+      <span class="badge badge-neutral">${cc} items</span>
+      <div class="ch-actions">
+        <button class="btn btn-primary btn-xs" onclick="tchOpenChap('${ch.id}')">Open →</button>
+        <button class="btn btn-ghost btn-xs" onclick="openChapModal('${ch.id}')">✏️</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteChapter('${ch.id}')">🗑</button>
+      </div></div>`;
+  }).join('')}</div>`);
+}
+
+function renderTchContent() {
+  const batch   = DB.batches.find(b=>b.id===TV.batchId);
+  const subject = DB.subjects.find(s=>s.id===TV.subjectId);
+  const chapter = DB.chapters.find(c=>c.id===TV.chapterId);
+  set$('tch-panel-title',`📂 ${esc(chapter?.name||'Chapter')}`);
+  set$('tch-panel-sub','Videos & Notes');
+  set$('tch-panel-actions',`
+    <button class="btn btn-ghost btn-sm" onclick="tchOpenSubj('${TV.subjectId}')">← Back</button>
+    <button class="btn btn-primary" onclick="openContModal()">➕ Add Content</button>`);
+  set$('tch-breadcrumb', breadcrumb([
+    {text:'Batches',fn:'renderTchBatchList()'},
+    {text:batch?.name,fn:`tchOpenBatch('${batch?.id}')`},
+    {text:subject?.name,fn:`tchOpenSubj('${subject?.id}')`},
+    {text:chapter?.name,current:true}
+  ]));
+  const items = DB.content.filter(c=>c.chapterId===TV.chapterId);
+  if (!items.length) { set$('tch-panel-body', emptyState('📂','No Content Yet','Add videos or PDF notes.','➕ Add Content','openContModal()')); return; }
+  set$('tch-panel-body', `<div class="content-grid">${items.map(c=>contCard(c,'teacher')).join('')}</div>`);
+}
+
+function renderAnalytics() {
+  const myBatches = DB.batches.filter(b=>b.teacherId===CU.id);
+  if (!myBatches.length) { set$('analytics-body', emptyState('📊','No Data','Create batches first.')); return; }
+  set$('analytics-body', myBatches.map(b=>{
+    const bids = [b.id];
+    const sids = DB.subjects.filter(s=>bids.includes(s.batchId)).map(s=>s.id);
+    const cids = DB.chapters.filter(c=>sids.includes(c.subjectId)).map(c=>c.id);
+    const allCont = DB.content.filter(c=>cids.includes(c.chapterId));
+    const enrolled = DB.enrollments.filter(e=>e.batchId===b.id);
+    const rows = enrolled.map(e=>{
+      const stu = DB.users.find(u=>u.id===e.studentId)||{name:'Unknown',email:''};
+      const viewed = DB.views.filter(v=>String(v.studentId)===String(e.studentId)&&allCont.some(c=>c.id===v.contentId)).length;
+      const pct = allCont.length>0 ? Math.round(viewed/allCont.length*100) : 0;
+      return `<tr><td>${esc(stu.name)}</td><td>${esc(stu.email)}</td>
+        <td>${viewed}/${allCont.length}</td>
+        <td><div class="prog-track" style="width:120px;"><div class="prog-fill" style="width:${pct}%"></div></div><span style="font-size:.74rem;color:var(--text2)">${pct}%</span></td></tr>`;
+    }).join('');
+    return `<div style="margin-bottom:24px;">
+      <div class="section-title">📦 ${esc(b.name)}</div>
+      ${enrolled.length
+        ? `<div class="tbl-wrap"><table><thead><tr><th>Student</th><th>Email</th><th>Viewed</th><th>Progress</th></tr></thead><tbody>${rows}</tbody></table></div>`
+        : '<p class="text-sm text-muted">No students enrolled yet.</p>'}
+    </div>`;
+  }).join(''));
+}
+
+/* ================================================================
+   TEACHER — BATCH CRUD
+   ================================================================ */
+function openBatchModal(editIdIn=null) {
+  editId = editIdIn;
+  set$('modal-batch-title', editId ? 'Edit Batch' : 'Create Batch');
+  const b = editId ? DB.batches.find(b=>b.id===editId) : null;
+  document.getElementById('bi-name').value  = b?.name||'';
+  document.getElementById('bi-thumb').value = b?.thumbnail||'';
+  showImgPreview('bi-thumb','bi-thumb-preview');
+  openModal('modal-batch');
+}
+
+async function saveBatch() {
+  const name  = document.getElementById('bi-name').value.trim();
+  let   thumb = document.getElementById('bi-thumb').value.trim();
+  if (!name) return toast('Batch name is required.','warning');
+  const autoThumb = extractThumbUrl(thumb);
+  if (autoThumb) thumb = autoThumb;
+  const btn = document.getElementById('btn-save-batch');
+  btn.disabled = true;
+  try {
+    const result = await api('saveBatch', { id:editId||undefined, name, thumbnail:thumb, teacherId:CU.id }, editId?'Updating batch…':'Creating batch…');
+    if (editId) {
+      const i = DB.batches.findIndex(b=>b.id===editId);
+      if(i!==-1) DB.batches[i] = { ...DB.batches[i], name, thumbnail:thumb };
+    } else {
+      DB.batches.push(result);
+    }
+    toast(editId ? 'Batch updated.' : 'Batch created!', 'success');
+    closeModal('modal-batch'); renderTchBatchList();
+  } catch(e) {} finally { btn.disabled = false; }
+}
+
+async function tchDeleteBatch(id) {
+  const b = DB.batches.find(b=>b.id===id);
+  confirm2('Delete Batch',`Delete "${b?.name}"? All data inside will be erased.`, async () => {
+    try {
+      await api('deleteBatch', { id }, 'Deleting batch…');
+      localDeleteBatch(id);
+      toast('Batch deleted.','success'); renderTchBatchList();
+    } catch(e){}
+  },'🗑');
+}
+
+/* SUBJECT CRUD */
+function openSubjModal(editIdIn=null) {
+  editId = editIdIn;
+  set$('modal-subj-title', editId ? 'Edit Subject' : 'Add Subject');
+  const s = editId ? DB.subjects.find(s=>s.id===editId) : null;
+  document.getElementById('si-name').value = s?.name||'';
+  document.getElementById('si-logo').value = s?.logo||'';
+  showImgPreview('si-logo','si-logo-preview');
+  openModal('modal-subject');
+}
+
+async function saveSubject() {
+  const name = document.getElementById('si-name').value.trim();
+  const logo = document.getElementById('si-logo').value.trim();
+  if (!name) return toast('Subject name is required.','warning');
+  const btn = document.getElementById('btn-save-subj');
+  btn.disabled = true;
+  try {
+    const result = await api('saveSubject', { id:editId||undefined, name, logo, batchId:TV.batchId }, editId?'Updating…':'Saving…');
+    if (editId) {
+      const i = DB.subjects.findIndex(s=>s.id===editId);
+      if(i!==-1) DB.subjects[i] = { ...DB.subjects[i], name, logo };
+    } else {
+      DB.subjects.push(result);
+    }
+    toast(editId ? 'Subject updated.' : 'Subject added!', 'success');
+    closeModal('modal-subject'); renderTchSubjects();
+  } catch(e) {} finally { btn.disabled = false; }
+}
+
+async function deleteSubject(id) {
+  const s = DB.subjects.find(s=>s.id===id);
+  confirm2('Delete Subject',`Delete "${s?.name}" and all its chapters?`, async () => {
+    try {
+      await api('deleteSubject', { id }, 'Deleting subject…');
+      const cids = DB.chapters.filter(c=>c.subjectId===id).map(c=>c.id);
+      DB.subjects = DB.subjects.filter(s=>s.id!==id);
+      DB.chapters = DB.chapters.filter(c=>c.subjectId!==id);
+      DB.content  = DB.content.filter(c=>!cids.includes(c.chapterId));
+      toast('Subject deleted.','success'); renderTchSubjects();
+    } catch(e){}
+  },'🗑');
+}
+
+/* CHAPTER CRUD */
+function openChapModal(editIdIn=null) {
+  editId = editIdIn;
+  set$('modal-chap-title', editId ? 'Edit Chapter' : 'Add Chapter');
+  const c = editId ? DB.chapters.find(c=>c.id===editId) : null;
+  document.getElementById('chi-name').value = c?.name||'';
+  document.getElementById('chi-logo').value = c?.logo||'';
+  showImgPreview('chi-logo','chi-logo-preview');
+  openModal('modal-chapter');
+}
+
+async function saveChapter() {
+  const name = document.getElementById('chi-name').value.trim();
+  const logo = document.getElementById('chi-logo').value.trim();
+  if (!name) return toast('Chapter name is required.','warning');
+  const btn = document.getElementById('btn-save-chap');
+  btn.disabled = true;
+  try {
+    const result = await api('saveChapter', { id:editId||undefined, name, logo, subjectId:TV.subjectId }, editId?'Updating…':'Saving…');
+    if (editId) {
+      const i = DB.chapters.findIndex(c=>c.id===editId);
+      if(i!==-1) DB.chapters[i] = { ...DB.chapters[i], name, logo };
+    } else {
+      DB.chapters.push(result);
+    }
+    toast(editId ? 'Chapter updated.' : 'Chapter added!', 'success');
+    closeModal('modal-chapter'); renderTchChapters();
+  } catch(e) {} finally { btn.disabled = false; }
+}
+
+async function deleteChapter(id) {
+  const ch = DB.chapters.find(c=>c.id===id);
+  confirm2('Delete Chapter',`Delete "${ch?.name}"?`, async () => {
+    try {
+      await api('deleteChapter', { id }, 'Deleting chapter…');
+      DB.chapters = DB.chapters.filter(c=>c.id!==id);
+      DB.content  = DB.content.filter(c=>c.chapterId!==id);
+      toast('Chapter deleted.','success'); renderTchChapters();
+    } catch(e){}
+  },'🗑');
+}
+
+/* ================================================================
+   CONTENT MODAL — PDF UPLOAD LOGIC
+   ================================================================ */
+function onContentTypeChange() {
+  const t = document.getElementById('ci-type').value;
+  document.getElementById('video-section').style.display = t==='video' ? '' : 'none';
+  document.getElementById('pdf-section').style.display   = t==='notes' ? '' : 'none';
+}
+
+function switchPdfTab(tab) {
+  pdfTabMode = tab;
+  document.getElementById('pdf-tab-upload').classList.toggle('active', tab==='upload');
+  document.getElementById('pdf-tab-url').classList.toggle('active', tab==='url');
+  document.getElementById('pdf-upload-tab').style.display = tab==='upload' ? '' : 'none';
+  document.getElementById('pdf-url-tab').style.display    = tab==='url'    ? '' : 'none';
+}
+
+function onDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
+function onDragLeave()  { document.getElementById('drop-zone').classList.remove('drag-over'); }
+function onDrop(e)      { e.preventDefault(); document.getElementById('drop-zone').classList.remove('drag-over'); handleFileInput(e.dataTransfer.files[0]); }
+function onFileSelect(e){ handleFileInput(e.target.files[0]); }
+
+function handleFileInput(file) {
+  if (!file) return;
+  if (file.type !== 'application/pdf') return toast('Sirf PDF files allowed hain.','warning');
+  if (file.size > 25 * 1024 * 1024) return toast('File 25MB se badi hai.','warning');
+  pdfFile = file;
+  document.getElementById('file-name-label').textContent = file.name;
+  document.getElementById('file-selected-box').classList.add('show');
+}
+
+function clearFile() {
+  pdfFile = null;
+  document.getElementById('pdf-file-input').value = '';
+  document.getElementById('file-selected-box').classList.remove('show');
+}
+
+function setUploadProgress(pct, label) {
+  document.getElementById('upload-prog-wrap').classList.toggle('show', pct>0 && pct<100);
+  document.getElementById('upload-prog-fill').style.width = pct + '%';
+  document.getElementById('upload-prog-label').textContent = label;
+}
+
+function openContModal(editIdIn=null) {
+  editId = editIdIn;
+  set$('modal-cont-title', editId ? 'Edit Content' : 'Add Content');
+  pdfFile = null;
+  clearFile();
+  setUploadProgress(0,'');
+  const c = editId ? DB.content.find(c=>c.id===editId) : null;
+  document.getElementById('ci-type').value  = c?.type||'video';
+  document.getElementById('ci-title').value = c?.title||'';
+  document.getElementById('ci-url').value   = c?.url||'';
+  document.getElementById('ci-thumb').value = c?.thumbnail||'';
+  document.getElementById('ci-pdf-url').value = (c?.type==='notes' && !c?.fileId) ? (c?.url||'') : '';
+  // Show existing file info if replacing
+  const existingDiv = document.getElementById('ci-existing-file');
+  if (c?.fileId) {
+    existingDiv.innerHTML = `Existing: <a href="${esc(c.url)}" target="_blank" style="color:var(--primary)">View current PDF</a> — naya file select karo replace karne ke liye`;
+    switchPdfTab('upload');
+  } else {
+    existingDiv.innerHTML = '';
+    switchPdfTab(c?.type==='notes' ? 'url' : 'upload');
+  }
+  const lbl = document.getElementById('ci-thumb-label');
+  if(lbl) lbl.innerHTML = 'Thumbnail <span style="color:var(--text2);font-size:.8rem">(YouTube se auto-fill hota hai)</span>';
+  onContentTypeChange();
+  showImgPreview('ci-thumb','ci-thumb-preview');
+  openModal('modal-content');
+}
+
+async function saveContent() {
+  const type  = document.getElementById('ci-type').value;
+  const title = document.getElementById('ci-title').value.trim();
+  if (!title) return toast('Title required.','warning');
+
+  let url = '', thumb = '', fileId = '';
+  const btn = document.getElementById('btn-save-cont');
+  btn.disabled = true;
+
+  try {
+    if (type === 'video') {
+      url = document.getElementById('ci-url').value.trim();
+      thumb = document.getElementById('ci-thumb').value.trim();
+      if (!url) { btn.disabled=false; return toast('Video URL required.','warning'); }
+      const autoThumb = extractThumbUrl(url);
+      if (autoThumb && !thumb) thumb = autoThumb;
+    } else {
+      // PDF
+      if (pdfTabMode === 'upload' && pdfFile) {
+        // Upload file to Drive via Apps Script
+        setUploadProgress(20,'Reading file…');
+        const base64 = await fileToBase64(pdfFile);
+        setUploadProgress(50,'Uploading to Google Drive…');
+        const existingItem = editId ? DB.content.find(c=>c.id===editId) : null;
+        const uploadResult = await api('uploadPDF', {
+          base64,
+          filename: pdfFile.name,
+          oldFileId: existingItem?.fileId || ''
+        }, 'Uploading PDF…');
+        setUploadProgress(90,'Saving…');
+        url    = uploadResult.url;
+        fileId = uploadResult.fileId;
+        setUploadProgress(0,'');
+      } else if (pdfTabMode === 'url') {
+        url = document.getElementById('ci-pdf-url').value.trim();
+        if (!url) { btn.disabled=false; return toast('PDF URL required.','warning'); }
+        // Keep existing fileId if just updating title/url without new file
+        const existingItem = editId ? DB.content.find(c=>c.id===editId) : null;
+        fileId = existingItem?.fileId || '';
+      } else if (pdfTabMode === 'upload' && !pdfFile) {
+        // No new file selected, keep existing
+        const existingItem = editId ? DB.content.find(c=>c.id===editId) : null;
+        if (existingItem) { url = existingItem.url; fileId = existingItem.fileId||''; }
+        else { btn.disabled=false; return toast('Koi file select karo ya URL do.','warning'); }
+      }
+    }
+
+    const result = await api('saveContent', {
+      id: editId||undefined, type, title, url, thumbnail:thumb, chapterId:TV.chapterId, fileId
+    }, editId?'Updating…':'Saving…');
+
+    if (editId) {
+      const i = DB.content.findIndex(c=>c.id===editId);
+      if(i!==-1) DB.content[i] = { ...DB.content[i], type, title, url, thumbnail:thumb, fileId };
+    } else {
+      DB.content.push(result);
+    }
+    toast(editId ? 'Content updated.' : 'Content added!','success');
+    closeModal('modal-content'); renderTchContent();
+  } catch(e) { setUploadProgress(0,''); } finally { btn.disabled = false; }
+}
+
+async function deleteContent(id) {
+  const c = DB.content.find(c=>c.id===id);
+  confirm2('Delete Content',`Delete "${c?.title}"?`, async () => {
+    try {
+      await api('deleteContent', { id, fileId: c?.fileId||'' }, 'Deleting…');
+      DB.content = DB.content.filter(c=>c.id!==id);
+      DB.views   = DB.views.filter(v=>v.contentId!==id);
+      toast('Content deleted.','success'); renderTchContent();
+    } catch(e){}
+  },'🗑');
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('File read failed'));
+    r.readAsDataURL(file);
+  });
+}
+
+/* ================================================================
+   CONTENT CARD
+   ================================================================ */
+function contCard(c, role='student') {
+  const isVid = c.type==='video';
+  const t = c.thumbnail ? `<img src="${esc(c.thumbnail)}" alt="" onerror="this.parentElement.querySelector('.content-thumb-icon').style.display='flex'">` : '';
+  const icon = isVid ? '🎥' : '📄';
+  let actions = '';
+  if (role==='teacher') {
+    actions = `<button class="btn btn-ghost btn-xs" onclick="openContModal('${c.id}')">✏️</button>
+               <button class="btn btn-danger btn-xs" onclick="deleteContent('${c.id}')">🗑</button>`;
+  } else {
+    const isViewed = DB.views.some(v=>String(v.studentId)===String(CU.id)&&v.contentId===c.id);
+    const vbadge = isViewed ? '<span class="viewed-tag">✅ Viewed</span>' : '';
+    actions = `${vbadge}<button class="btn btn-primary btn-xs" onclick="openViewer('${c.id}')">▶ Open</button>
+               <a class="btn btn-success btn-xs" href="${esc(c.url)}" target="_blank">⬇</a>`;
+  }
+  return `<div class="content-card">
+    <div class="content-thumb">
+      ${t}<span class="content-thumb-icon" style="position:relative;z-index:1;">${icon}</span>
+      <span class="content-type-tag">${isVid?'VIDEO':'PDF'}</span>
+    </div>
+    <div class="content-body">
+      <div class="content-title">${esc(c.title)}</div>
+      <div class="content-row">${actions}</div>
+    </div></div>`;
+}
+
+function batchCardHtml(b, _role) {
+  const t = b.thumbnail ? `<img src="${esc(b.thumbnail)}" alt="" onerror="this.style.display='none'">` : '';
+  return `<div class="batch-card" style="cursor:pointer;" onclick="tchOpenBatch('${b.id}')">
+    <div class="batch-thumb">${t}<span class="batch-thumb-placeholder">${t?'':'📦'}</span></div>
+    <div class="batch-body">
+      <div class="batch-name">${esc(b.name)}</div>
+      <div class="batch-meta">Click to open →</div>
+    </div></div>`;
+}
+
+/* ================================================================
+   STUDENT — DASHBOARD
+   ================================================================ */
+function renderStudentDash() {
+  document.getElementById('stu-greet').textContent = `👋 Welcome, ${CU.name}!`;
+  const enrolls  = DB.enrollments.filter(e=>String(e.studentId)===String(CU.id));
+  const bids     = enrolls.map(e=>e.batchId);
+  const subs     = DB.subjects.filter(s=>bids.includes(s.batchId));
+  const chaps    = DB.chapters.filter(c=>subs.map(s=>s.id).includes(c.subjectId));
+  const allCont  = DB.content.filter(c=>chaps.map(ch=>ch.id).includes(c.chapterId));
+  const views    = DB.views.filter(v=>String(v.studentId)===String(CU.id));
+  set$('stu-stats', `
+    ${statCard('📦','ic-indigo', enrolls.length,'Enrolled Batches')}
+    ${statCard('📚','ic-blue', subs.length,'Subjects')}
+    ${statCard('✅','ic-green', views.length,'Items Viewed')}
+    ${statCard('📌','ic-orange', DB.batches.length,'Available Batches')}
+  `);
+  const myBatches = DB.batches.filter(b=>bids.includes(b.id));
+  set$('stu-continue', myBatches.length
+    ? myBatches.slice(0,4).map(b=>{
+        const t = b.thumbnail ? `<img src="${esc(b.thumbnail)}" alt="" onerror="this.style.display='none'">` : '';
+        return `<div class="batch-card" style="cursor:pointer;" onclick="stuOpenBatch('${b.id}')">
+          <div class="batch-thumb">${t}<span class="batch-thumb-placeholder">${t?'':'📦'}</span></div>
+          <div class="batch-body"><div class="batch-name">${esc(b.name)}</div><div class="batch-meta">Continue →</div></div>
+        </div>`;
+      }).join('')
+    : emptyState('📦','Not Enrolled Yet','Browse batches and join to start learning.','Browse Batches',"goTo('student-browse')"));
+}
+
+function renderBrowse() {
+  const q = (document.getElementById('search-browse')?.value||'').toLowerCase();
+  const batches = DB.batches.filter(b=>b.name?.toLowerCase().includes(q));
+  if (!batches.length) { set$('browse-grid', emptyState('🔍','No Batches Found','Try a different search.')); return; }
+  set$('browse-grid', batches.map(b=>{
+    const isJoined = DB.enrollments.some(e=>String(e.studentId)===String(CU.id)&&e.batchId===b.id);
+    const teacher  = DB.users.find(u=>u.id===b.teacherId)||{name:'Unknown'};
+    const sc = DB.enrollments.filter(e=>e.batchId===b.id).length;
+    const t = b.thumbnail ? `<img src="${esc(b.thumbnail)}" alt="" onerror="this.style.display='none'">` : '';
+    return `<div class="batch-card">
+      <div class="batch-thumb">${t}<span class="batch-thumb-placeholder">${t?'':'📦'}</span></div>
+      <div class="batch-body">
+        <div class="batch-name">${esc(b.name)}</div>
+        <div class="batch-meta"><span>👨‍🏫 ${esc(teacher.name)}</span><span>👨‍🎓 ${sc}</span></div>
+        <div class="batch-actions">
+          ${isJoined
+            ? `<span class="badge badge-success">✅ Enrolled</span><button class="btn btn-outline btn-sm" onclick="stuOpenBatch('${b.id}')">Open →</button>`
+            : `<button class="btn btn-primary btn-sm" onclick="joinBatch('${b.id}')">🚀 Join Now</button>`}
+        </div>
+      </div></div>`;
+  }).join(''));
+}
+
+async function joinBatch(bid) {
+  try {
+    const result = await api('joinBatch', { studentId:CU.id, batchId:bid }, 'Joining…');
+    DB.enrollments.push(result);
+    toast('🎉 Joined successfully!','success');
+    renderBrowse(); renderStudentDash();
+  } catch(e){}
+}
+
+/* STUDENT MY BATCHES */
+function renderStudentMyPanel() {
+  if(SV.level==='batches')  renderStuBatchList();
+  else if(SV.level==='subjects') renderStuSubjects();
+  else if(SV.level==='chapters') renderStuChapters();
+  else renderStuContent();
+}
+function stuOpenBatch(bid) { SV={level:'subjects',batchId:bid,subjectId:null,chapterId:null}; goTo('student-my'); }
+function stuOpenSubj(sid)  { SV.level='chapters'; SV.subjectId=sid; renderStudentMyPanel(); }
+function stuOpenChap(cid)  { SV.level='content'; SV.chapterId=cid; renderStudentMyPanel(); }
+
+function renderStuBatchList() {
+  SV = {level:'batches',batchId:null,subjectId:null,chapterId:null};
+  set$('stu-my-title','📚 My Batches');
+  set$('stu-my-sub','Your enrolled courses');
+  set$('stu-my-actions',''); set$('stu-breadcrumb','');
+  const enrolls  = DB.enrollments.filter(e=>String(e.studentId)===String(CU.id));
+  const batches  = DB.batches.filter(b=>enrolls.some(e=>e.batchId===b.id));
+  if (!batches.length) { set$('stu-my-body', emptyState('📚','No Batches Yet','Browse and join batches!','Browse Batches',"goTo('student-browse')")); return; }
+  set$('stu-my-body', `<div class="cards-grid">${batches.map(b=>{
+    const teacher = DB.users.find(u=>u.id===b.teacherId)||{name:'Unknown'};
+    const t = b.thumbnail ? `<img src="${esc(b.thumbnail)}" alt="" onerror="this.style.display='none'">` : '';
+    return `<div class="batch-card">
+      <div class="batch-thumb">${t}<span class="batch-thumb-placeholder">${t?'':'📦'}</span></div>
+      <div class="batch-body">
+        <div class="batch-name">${esc(b.name)}</div>
+        <div class="batch-meta"><span>👨‍🏫 ${esc(teacher.name)}</span></div>
+        <div class="batch-actions"><button class="btn btn-primary btn-sm" onclick="stuOpenBatch('${b.id}')">📚 Continue</button></div>
+      </div></div>`;
+  }).join('')}</div>`);
+}
+
+function renderStuSubjects() {
+  const batch = DB.batches.find(b=>b.id===SV.batchId);
+  set$('stu-my-title',`📚 ${esc(batch?.name||'')}`);
+  set$('stu-my-sub','Choose a subject');
+  set$('stu-my-actions',`<button class="btn btn-ghost btn-sm" onclick="renderStuBatchList()">← Back</button>`);
+  set$('stu-breadcrumb', breadcrumb([{text:'My Batches',fn:'renderStuBatchList()'},{text:batch?.name,current:true}]));
+  const subjects = DB.subjects.filter(s=>s.batchId===SV.batchId);
+  if (!subjects.length) { set$('stu-my-body', emptyState('📚','No Subjects Yet','Teacher ne abhi koi subject nahi daala.')); return; }
+  set$('stu-my-body', `<div class="accordion-list">${subjects.map(s=>{
+    const cc = DB.chapters.filter(c=>c.subjectId===s.id).length;
+    const logoHtml = s.logo ? `<img src="${esc(s.logo)}" alt="" onerror="this.outerHTML='📚'">` : '📚';
+    return `<div class="accordion-item" style="cursor:pointer;" onclick="stuOpenSubj('${s.id}')">
+      <div class="accordion-head">
+        <div class="subj-icon">${logoHtml}</div>
+        <div class="accordion-title">${esc(s.name)}</div>
+        <span class="badge badge-neutral">${cc} chapters</span>
+        <span class="accordion-arrow">›</span>
+      </div></div>`;
+  }).join('')}</div>`);
+}
+
+function renderStuChapters() {
+  const batch   = DB.batches.find(b=>b.id===SV.batchId);
+  const subject = DB.subjects.find(s=>s.id===SV.subjectId);
+  set$('stu-my-title',`📖 ${esc(subject?.name||'')}`);
+  set$('stu-my-sub','Select a chapter');
+  set$('stu-my-actions',`<button class="btn btn-ghost btn-sm" onclick="stuOpenBatch('${SV.batchId}')">← Back</button>`);
+  set$('stu-breadcrumb', breadcrumb([
+    {text:'My Batches',fn:'renderStuBatchList()'},
+    {text:batch?.name,fn:`stuOpenBatch('${SV.batchId}')`},
+    {text:subject?.name,current:true}
+  ]));
+  const chapters = DB.chapters.filter(c=>c.subjectId===SV.subjectId);
+  if (!chapters.length) { set$('stu-my-body', emptyState('📖','No Chapters Yet','Teacher ne abhi koi chapter nahi daala.')); return; }
+  const allCont = DB.content;
+  const views   = DB.views;
+  set$('stu-my-body', `<div class="accordion-list">${chapters.map(ch=>{
+    const cc     = allCont.filter(c=>c.chapterId===ch.id);
+    const viewed = cc.filter(c=>views.some(v=>String(v.studentId)===String(CU.id)&&v.contentId===c.id)).length;
+    const pct    = cc.length>0 ? Math.round(viewed/cc.length*100) : 0;
+    const chIcon = ch.logo ? `<img src="${esc(ch.logo)}" style="width:1.5rem;height:1.5rem;object-fit:cover;border-radius:4px;flex-shrink:0" onerror="this.outerHTML='📖'">` : '📖';
+    return `<div class="accordion-item" style="cursor:pointer;" onclick="stuOpenChap('${ch.id}')">
+      <div class="accordion-head">
+        <span class="ch-icon">${chIcon}</span>
+        <div class="accordion-title">${esc(ch.name)}</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-left:auto;margin-right:8px;">
+          <span class="text-xs text-muted">${viewed}/${cc.length} viewed</span>
+          <div class="prog-track" style="width:80px;"><div class="prog-fill" style="width:${pct}%"></div></div>
+        </div>
+        <span class="accordion-arrow">›</span>
+      </div></div>`;
+  }).join('')}</div>`);
+}
+
+function renderStuContent() {
+  const batch   = DB.batches.find(b=>b.id===SV.batchId);
+  const subject = DB.subjects.find(s=>s.id===SV.subjectId);
+  const chapter = DB.chapters.find(c=>c.id===SV.chapterId);
+  set$('stu-my-title',`📂 ${esc(chapter?.name||'')}`);
+  set$('stu-my-sub','Videos & Notes');
+  set$('stu-my-actions',`<button class="btn btn-ghost btn-sm" onclick="stuOpenSubj('${SV.subjectId}')">← Back</button>`);
+  set$('stu-breadcrumb', breadcrumb([
+    {text:'My Batches',fn:'renderStuBatchList()'},
+    {text:batch?.name,fn:`stuOpenBatch('${SV.batchId}')`},
+    {text:subject?.name,fn:`stuOpenSubj('${SV.subjectId}')`},
+    {text:chapter?.name,current:true}
+  ]));
+  const items = DB.content.filter(c=>c.chapterId===SV.chapterId);
+  if (!items.length) { set$('stu-my-body', emptyState('📂','No Content Yet','Teacher ne abhi koi content nahi daala.')); return; }
+  set$('stu-my-body', `<div class="content-grid">${items.map(c=>contCard(c,'student')).join('')}</div>`);
+}
+
+/* ================================================================
+   VIEWER
+   ================================================================ */
+async function openViewer(contentId) {
+  const c = DB.content.find(c=>c.id===contentId);
+  if (!c) return;
+  // Mark viewed (silent — don't block UI)
+  if (!DB.views.some(v=>String(v.studentId)===String(CU.id)&&v.contentId===contentId)) {
+    DB.views.push({ studentId:CU.id, contentId, viewedAt:Date.now() });
+    api('markViewed', { studentId:CU.id, contentId }, '', true).catch(()=>{});
+  }
+  set$('viewer-title', esc(c.title));
+  document.getElementById('viewer-dl').href = c.url;
+
+  let body = '';
+  if (c.type==='video') {
+    let url = c.url;
+    try {
+      if(url.includes('youtube.com/watch')){ const v=new URL(url).searchParams.get('v'); url=`https://www.youtube.com/embed/${v}?rel=0`; }
+      else if(url.includes('youtu.be/')){ const v=url.split('youtu.be/')[1]?.split('?')[0]; url=`https://www.youtube.com/embed/${v}?rel=0`; }
+    } catch(e){}
+    body = `<iframe class="viewer-frame" src="${esc(url)}" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>`;
+  } else {
+    body = `<iframe class="pdf-frame" src="${esc(c.url)}"></iframe>`;
+  }
+  set$('viewer-body', body);
+  openModal('modal-viewer');
+  setTimeout(() => { if(SV.level==='content') renderStuContent(); }, 300);
+}
+function clearViewer() { set$('viewer-body',''); }
+function closeViewer() { closeModal('modal-viewer'); clearViewer(); }
+
+/* ================================================================
+   LOADING BAR ANIMATION
+   ================================================================ */
+function animateLoader(msgs) {
+  let i = 0;
+  const sub  = document.getElementById('loader-sub');
+  const fill = document.getElementById('loader-fill');
+  const interval = setInterval(() => {
+    if (i < msgs.length) {
+      sub.textContent  = msgs[i].text;
+      fill.style.width = msgs[i].pct + '%';
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 400);
+  return interval;
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+(async function init() {
+  applyTheme();
+  if (APP_LOGO_URL) {
+    const img = `<img src="${APP_LOGO_URL}" style="width:100%;height:100%;object-fit:contain;border-radius:10px" onerror="this.outerHTML='🎓'">`;
+    const le = document.getElementById('loader-logo-el'); if(le) le.innerHTML = img;
+    const ae = document.getElementById('auth-logo-el');   if(ae) ae.innerHTML = img;
+  }
+
+  const fill = document.getElementById('loader-fill');
+
+  // Check session
+  const saved = sessionStorage.getItem('fs_cur');
+  if (saved) {
+    try {
+      CU = JSON.parse(saved);
+      const interval = animateLoader([
+        {text:'Checking session…',   pct:20},
+        {text:'Loading your data…',  pct:50},
+        {text:'Preparing dashboard…',pct:80}
+      ]);
+      try {
+        await loadData();
+        clearInterval(interval);
+        fill.style.width = '100%';
+        await new Promise(r=>setTimeout(r,300));
+        document.getElementById('loading-overlay').classList.add('fade-out');
+        setTimeout(() => document.getElementById('loading-overlay').remove(), 500);
+        bootApp();
+        return;
+      } catch(e) {
+        clearInterval(interval);
+        sessionStorage.removeItem('fs_cur');
+        CU = null;
+      }
+    } catch(e) { sessionStorage.removeItem('fs_cur'); }
+  }
+
+  // No session — show login after loading screen
+  animateLoader([{text:'Loading…',pct:30},{text:'Almost ready…',pct:70},{text:'Welcome!',pct:100}]);
+  await new Promise(r => setTimeout(r, 1400));
+  document.getElementById('loading-overlay').classList.add('fade-out');
+  setTimeout(() => document.getElementById('loading-overlay').remove(), 500);
+})();
+</script>
+</body>
+</html>
